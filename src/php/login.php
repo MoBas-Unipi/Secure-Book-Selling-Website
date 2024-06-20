@@ -138,10 +138,6 @@ if (checkPostFields(['email', 'password'])) {
                         $blockedTime = $dataQuery['blockedTime'] + strtotime($dataQuery['timestampAccess']);
                         $currentTime = time();
                         if (($currentTime - $blockedTime) < 0) {
-                            $updates = updateBlockLoginInformation(0, $dataQuery['blockedTime'] + 1800, $email);
-                            if (!updateFailedAccesses($updates)) {
-                                throw new Exception('Something went wrong during the login.');
-                            }
                             throw new Exception('Your account is currently blocked');
                         }
                     }
@@ -149,6 +145,14 @@ if (checkPostFields(['email', 'password'])) {
                     if (login($email, $submittedPassword, $dataQuery['timestampAccess'], $dataQuery['failedAccesses'], $dataQuery['blockedTime'])) {
                         $logger->log('INFO', "Login of the user: " . $email . ", Succeeded");
                         $accessControlHandler->redirectToHome();
+                    } else {
+                        if ($dataQuery['blockedTime'] !== 0 && $dataQuery['failedAccesses'] === 0) {
+                            $updates = updateBlockLoginInformation(0, $dataQuery['blockedTime'] + 1800, $email);
+                            if (updateFailedAccesses($updates)) {
+                                throw new Exception('Something went wrong during the login.');
+                            }
+                            throw new Exception('Your account is currently blocked');
+                        }
                     }
                 } else {
                     throw new Exception("Email and/or password are not valid.");

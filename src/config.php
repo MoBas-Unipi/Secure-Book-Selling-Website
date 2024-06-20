@@ -33,9 +33,9 @@ $debug = true;
 $sessionLifetime = 7200;
 // Number of allowed login attempts before blocking
 $loginAttempts = 3;
-// Time window for login attempts to prevent brute force attacks, set to 30 seconds
-$timeWindowLogin = 30;
-// Minimum interval between OTP requests set to 2 minutes
+// Time window for login attempts to prevent brute force attacks
+$timeWindowLogin = 20;
+// Minimum interval between OTP requests
 $otpInterval = 120;
 
 // --- Session Cookie Parameters ---

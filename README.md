@@ -104,6 +104,7 @@ www.bookselling.snh
 - ```./manage_docker.sh remove_containers``` **Remove all stopped Docker containers**
 - ```./manage_docker.sh image_status``` **Show status of Docker images**
 - ```./manage_docker.sh remove_images``` **Remove all Docker images**
+- ```./manage_docker.sh remove_network``` **Remove the bookselling specific Docker network**
 <br>
 
 
@@ -116,7 +117,6 @@ localhost:8800
 * Access the MySQL DataBase with the following credentials:
 ```
 host: localhost
-port: 9906
 user: root or the one in the .env file
 password: in the .env file
 database: in the .env file

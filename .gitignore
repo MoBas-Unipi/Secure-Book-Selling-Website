@@ -1,2 +1,3 @@
 .vscode/
 .idea/
+src/logs/web_server_logs.txt

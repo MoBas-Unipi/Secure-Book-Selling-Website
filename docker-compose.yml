@@ -1,0 +1,68 @@
+version: '3.8'
+services:
+    web-server:
+        container_name: web-server
+        image: php:8.2-apache
+        restart: always
+        depends_on:
+            - mysql-server
+        env_file:
+            - .env
+        volumes:
+            # Base directory of the website
+            - ./src:/var/www/html/
+            # Storage of the e-books
+            - ./apache_conf/e-books:/home/bookselling/e-books-mounted
+            # HTTPS configuration files
+            - ./apache_conf/ssl_conf/certificates/bookselling:/etc/ssl/ssl_certificates
+            - ./apache_conf/ssl_conf/sites-available:/etc/apache2/sites-available
+            # Environment configuration script
+            - ./apache_conf/setup_environment.sh:/home/bookselling/setup_environment.sh
+        command: /bin/bash -c "/home/bookselling/setup_environment.sh"
+        ports:
+            - "127.0.0.1:443:443"
+        networks:
+            network:
+                ipv4_address: 10.0.0.2  # IP address for web-server
+
+    mysql-server:
+        container_name: mysql-server
+        image: mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        ports:
+            - "127.0.0.1:9906:3306"
+        volumes:
+            # Custom MySQL configuration files
+            - ./mysql_conf/my/custom:/etc/mysql/conf.d
+            # Initial secure book selling database script
+            - ./mysql_conf/secure_book_selling_db.sql:/docker-entrypoint-initdb.d/secure_book_selling_db.sql
+        networks:
+            network:
+                ipv4_address: 10.0.0.3  # IP address for mysql-server
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - "127.0.0.1:8800:80"
+        restart: always
+        environment:
+            PMA_HOST: mysql-server
+        depends_on:
+            - mysql-server
+        networks:
+            network:
+                ipv4_address: 10.0.0.4  # IP address for phpmyadmin
+
+networks:
+    network:
+        driver: bridge
+        ipam:
+            config:
+                -
+                    subnet: 10.0.0.0/16  # Subnet for the network
+                    gateway: 10.0.0.1    # Gateway for the network

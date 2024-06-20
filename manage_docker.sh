@@ -2,7 +2,7 @@
 
 # Check if exactly one argument is provided
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 {start|stop|status|remove_containers|image_status|remove_images}"
+    echo "Usage: $0 {start|stop|status|remove_containers|image_status|remove_images|remove_network}"
     exit 1
 fi
 
@@ -34,10 +34,14 @@ case $1 in
         # Remove all Docker images
         sudo docker rmi $(sudo docker images -a -q)
         ;;
+    remove_network)
+        # Remove the specified Docker network
+        sudo docker network rm secure-book-selling_network
+        ;;
     *)
         # Invalid command entered
         echo "Invalid command: $1"
-        echo "Usage: $0 {start|stop|status|remove_containers|image_status|remove_images}"
+        echo "Usage: $0 {start|stop|status|remove_containers|image_status|remove_images|remove_network}"
         exit 1
         ;;
 esac
